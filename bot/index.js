@@ -50,15 +50,27 @@ function listSubscriptions(chatId) {
 }
 
 bot.start((ctx) => {
-  ctx.reply(
+ctx.reply(
     "👋 Welcome to *DomaPulse*!\n\n" +
-    "Use /subscribe <domain> to get alerts\n" +
-    "Use /unsubscribe <domain> to stop alerts\n" +
-    "Use /list to see your subscriptions",
+      "Stay updated with on-chain domain events powered by Doma Protocol.\n\n" +
+      "👉 Use /help to see available commands.",
     { parse_mode: "Markdown" }
   );
   console.log(`User chat ID: ${ctx.chat.id}`);
 });
+
+bot.help((ctx) =>
+  ctx.reply(
+    "📖 *DomaPulse Commands:*\n\n" +
+      "/start - Welcome message\n" +
+      "/help - Show this help menu\n" +
+      "/subscribe <domain> - Subscribe to a domain\n" +
+      "/unsubscribe <domain> - Unsubscribe from a domain\n" +
+      "/list - Show your subscriptions\n" +
+      "/status - Bot status + RPC info",
+    { parse_mode: "Markdown" }
+  )
+);
 
 bot.command('subscribe', (ctx) => {
   const domain = ctx.message.text.split(' ')[1];
@@ -78,6 +90,24 @@ bot.command('list', (ctx) => {
   const subs = listSubscriptions(ctx.chat.id);
   if (subs.length === 0) return ctx.reply('📭 You have no subscriptions yet.');
   ctx.reply('📌 Your subscriptions:\n' + subs.map(d => `• ${d}`).join('\n'));
+});
+
+bot.command("status", async (ctx) => {
+  try {
+    const network = await provider.getNetwork();
+    const chainId = network.chainId;
+    const subs = listSubscriptions(ctx.chat.id);
+    const count = subs.length;
+    ctx.reply(
+      `✅ *DomaPulse is running!*\n\n` +
+        `🌐 RPC Chain ID: \`${chainId}\`\n` +
+        `📌 Active subscriptions: *${count}*`,
+      { parse_mode: "Markdown" }
+    );
+  } catch (err) {
+    console.error("Status error:", err);
+    ctx.reply("⚠️ Failed to fetch status. Check RPC connection.");
+  }
 });
 
 provider.on('block', async (blockNumber) => {

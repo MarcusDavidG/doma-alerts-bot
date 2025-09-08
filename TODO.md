@@ -1,10 +1,7 @@
-# TODO: Implement User Subscriptions for DomaPulse Bot
+# TODO: Implement Command Enhancements for DomaPulse Bot
 
-- [x] Create subscriptions.json file
-- [x] Add helper functions: loadSubscriptions, saveSubscriptions, addSubscription, removeSubscription, listSubscriptions
-- [x] Add Telegram commands: /subscribe, /unsubscribe, /list
-- [x] Update event listeners to notify only subscribed users
-- [x] Test the subscription system
-- [x] Restart bot with npm start
-- [x] Fix path issue in SUBSCRIPTIONS_FILE
-- [x] Add and push changes to GitHub
+- [x] /help command - Show all available commands with short descriptions
+- [x] /status command - Query RPC for chainId, show bot status, chainId, subscription count
+- [x] Update /start command - Add branding, description, /help instruction
+- [x] Restart the bot
+- [x] Test the new commands in Telegram (tested by user, working)
