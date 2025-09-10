@@ -50,10 +50,17 @@ function listSubscriptions(chatId) {
 }
 
 bot.start((ctx) => {
-ctx.reply(
+  const subs = loadSubscriptions();
+  if (!subs[ctx.chat.id]) {
+    subs[ctx.chat.id] = [];
+    saveSubscriptions(subs);
+  }
+  ctx.reply(
     "👋 Welcome to *DomaPulse*!\n\n" +
-      "Stay updated with on-chain domain events powered by Doma Protocol.\n\n" +
-      "👉 Use /help to see available commands.",
+      "Your real-time alert bot for Doma Protocol events.\n\n" +
+      "Stay updated on domain registrations, expirations, and transfers.\n\n" +
+      "Use /help to see available commands.\n\n" +
+      "🌐 [Learn more about Doma Protocol](https://doma.xyz)",
     { parse_mode: "Markdown" }
   );
   console.log(`User chat ID: ${ctx.chat.id}`);
@@ -67,7 +74,8 @@ bot.help((ctx) =>
       "/subscribe <domain> - Subscribe to a domain\n" +
       "/unsubscribe <domain> - Unsubscribe from a domain\n" +
       "/list - Show your subscriptions\n" +
-      "/status - Bot status + RPC info",
+      "/status - Bot status + RPC info\n" +
+      "/simulate [domain] - Simulate fake events for a domain (default: test.dom)",
     { parse_mode: "Markdown" }
   )
 );
@@ -110,10 +118,40 @@ bot.command("status", async (ctx) => {
   }
 });
 
-provider.on('block', async (blockNumber) => {
-  const chatId = process.env.TEST_CHAT_ID;
-  await bot.telegram.sendMessage(chatId, `New block mined: ${blockNumber}`);
+bot.command('simulate', (ctx) => {
+  const domain = ctx.message.text.split(' ')[1] || 'test.dom';
+  const fakeOwner = '0x1234567890abcdef1234567890abcdef12345678';
+  const fakeFrom = '0xabcdef1234567890abcdef1234567890abcdef12';
+  const fakeTo = '0x7890abcdef1234567890abcdef1234567890abcd';
+  const fakeTxHash = '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef';
+
+  const events = [
+    {
+      type: 'Registered',
+      msg: `📢 *Domain Registered*  \n🔑 Owner: \`${fakeOwner}\`  \n🌐 Domain: ${domain}  \n⛓️ Tx: [View on Explorer](${explorerUrl}/${fakeTxHash})  \n🌐 [View on Doma Marketplace](https://app.doma.xyz/domain/${domain})  \n🔗 app.doma.xyz/domain/${domain}`
+    },
+    {
+      type: 'Expired',
+      msg: `⚠️ *Domain Expired*  \n🌐 Domain: ${domain}  \n⛓️ Tx: [View on Explorer](${explorerUrl}/${fakeTxHash})  \n🌐 [View on Doma Marketplace](https://app.doma.xyz/domain/${domain})  \n🔗 app.doma.xyz/domain/${domain}`
+    },
+    {
+      type: 'Transferred',
+      msg: `🔄 *Domain Transferred*  \n🌐 Domain: ${domain}  \n👤 From: \`${fakeFrom}\`  \n👤 To: \`${fakeTo}\`  \n⛓️ Tx: [View on Explorer](${explorerUrl}/${fakeTxHash})  \n🌐 [View on Doma Marketplace](https://app.doma.xyz/domain/${domain})  \n🔗 app.doma.xyz/domain/${domain}`
+    }
+  ];
+
+  let index = 0;
+  const sendNext = () => {
+    if (index < events.length) {
+      ctx.reply(events[index].msg, { parse_mode: "Markdown" });
+      index++;
+      setTimeout(sendNext, 4000); // 4 seconds delay
+    }
+  };
+  sendNext();
 });
+
+const explorerUrl = "https://explorer-testnet.doma.xyz/tx";
 
 function notifySubscribers(domain, message) {
   const subs = loadSubscriptions();
@@ -124,19 +162,22 @@ function notifySubscribers(domain, message) {
   }
 }
 
-domainManager.on('DomainRegistered', async (name, owner) => {
+domainManager.on('DomainRegistered', async (name, owner, event) => {
   console.log(`🌐 Domain Registered: ${name} by ${owner}`);
-  notifySubscribers(name, `🌐 *${name}* was just registered by \`${owner}\``);
+  const msg = `📢 *Domain Registered*  \n🔑 Owner: \`${owner}\`  \n🌐 Domain: ${name}  \n⛓️ Tx: [View on Explorer](${explorerUrl}/${event.transactionHash})  \n🌐 [View on Doma Marketplace](https://app.doma.xyz/domain/${name})  \n🔗 app.doma.xyz/domain/${name}`;
+  notifySubscribers(name, msg);
 });
 
-domainManager.on('DomainExpired', async (name) => {
+domainManager.on('DomainExpired', async (name, event) => {
   console.log(`⚠️ Domain Expired: ${name}`);
-  notifySubscribers(name, `⚠️ *${name}* has expired!`);
+  const msg = `⚠️ *Domain Expired*  \n🌐 Domain: ${name}  \n⛓️ Tx: [View on Explorer](${explorerUrl}/${event.transactionHash})  \n🌐 [View on Doma Marketplace](https://app.doma.xyz/domain/${name})  \n🔗 app.doma.xyz/domain/${name}`;
+  notifySubscribers(name, msg);
 });
 
-domainManager.on('DomainTransferred', async (name, from, to) => {
+domainManager.on('DomainTransferred', async (name, from, to, event) => {
   console.log(`🔄 Domain Transferred: ${name} from ${from} → ${to}`);
-  notifySubscribers(name, `🔄 *${name}* transferred\nFrom: \`${from}\`\nTo: \`${to}\``);
+  const msg = `🔄 *Domain Transferred*  \n🌐 Domain: ${name}  \n👤 From: \`${from}\`  \n👤 To: \`${to}\`  \n⛓️ Tx: [View on Explorer](${explorerUrl}/${event.transactionHash})  \n🌐 [View on Doma Marketplace](https://app.doma.xyz/domain/${name})  \n🔗 app.doma.xyz/domain/${name}`;
+  notifySubscribers(name, msg);
 });
 
 console.log('✅ Bot is running…');

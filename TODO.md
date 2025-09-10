@@ -1,7 +1,14 @@
-# TODO: Implement Command Enhancements for DomaPulse Bot
+# TODO: Update bot/index.js for DomaPulse
 
-- [x] /help command - Show all available commands with short descriptions
-- [x] /status command - Query RPC for chainId, show bot status, chainId, subscription count
-- [x] Update /start command - Add branding, description, /help instruction
-- [x] Restart the bot
-- [x] Test the new commands in Telegram (tested by user, working)
+- [x] Remove the block listener (provider.on("block", ...))
+- [x] Add const explorerUrl = "https://explorer-testnet.doma.xyz/tx";
+- [x] Update DomainRegistered event listener: format message in Markdown, include transaction link, use notifySubscribers
+- [x] Update DomainExpired event listener: format message in Markdown, include transaction link, use notifySubscribers
+- [x] Update DomainTransferred event listener: format message in Markdown, include transaction link, use notifySubscribers
+- [x] Verify bot starts cleanly and only notifies subscribed users
+- [x] Add /simulate command to generate fake events for a domain (with 4-second delays between messages)
+- [x] Update /help to include /simulate
+- [x] Remove TEST_CHAT_ID logic completely
+- [x] Update /start to store chat.id in subscriptions.json if not present
+- [x] Ensure event listeners check all chatId entries and send alerts only to subscribed users
+- [x] Allow multiple users to subscribe independently

@@ -13,6 +13,8 @@ DomaPulse is a Telegram bot that monitors the Doma Protocol smart contracts for 
 - **Real-time Event Monitoring**: Listens to DomainRegistered, DomainExpired, and DomainTransferred events from Doma Protocol contracts.
 - **User Subscriptions**: Subscribe/unsubscribe to specific domains using simple Telegram commands.
 - **Personalized Alerts**: Only receive notifications for domains you're interested in.
+- **Doma Marketplace Integration**: Event alerts include clickable links to view domains on the Doma Marketplace.
+- **Simulated Events**: Test the bot with simulated domain events using the /simulate command.
 - **Bot Status**: Check bot health and RPC connection status.
 - **Easy Commands**: Intuitive command interface with help menu.
 
@@ -51,10 +53,26 @@ This project belongs to the **Web3 / Blockchain** category, specifically focusin
    npm start
    ```
 
+## Deployment
+
+This bot can be deployed to Railway for 24/7 operation.
+
+### Railway Deployment
+
+1. Go to [Railway.app](https://railway.app) and create a new project.
+2. Link your GitHub repository containing this project.
+3. Railway will automatically detect the `railway.json` config and deploy the bot.
+4. In the Railway dashboard, add the following environment variables:
+   - `TELEGRAM_BOT_TOKEN`: Your Telegram bot token from BotFather.
+   - `DOMA_RPC_URL`: The RPC URL for the Doma Protocol blockchain.
+5. Railway will run `npm install` and then `npm start` to keep the bot running continuously.
+
+The bot will be accessible 24/7 without manual intervention.
+
 ## Usage
 
 1. Start a chat with your bot on Telegram by searching for your bot's username.
-2. Use `/start` to receive a welcome message that introduces the bot and its purpose.
+2. Use `/start` to receive a welcome message introducing the bot, its purpose, and a link to learn more about Doma Protocol.
 3. Use `/help` to see a list of all available commands along with brief descriptions.
 4. Subscribe to a domain by typing `/subscribe example.dom`. Replace `example.dom` with the domain you want to monitor.
 5. Check your current subscriptions with `/list`. This will display all domains you are subscribed to.
@@ -63,12 +81,13 @@ This project belongs to the **Web3 / Blockchain** category, specifically focusin
 
 ## Commands
 
-- `/start` - Sends a welcome message and brief introduction to the bot.
+- `/start` - Sends a welcome message introducing the bot, its purpose, and a link to learn more about Doma Protocol.
 - `/help` - Displays a help menu listing all available commands and their usage.
 - `/subscribe <domain>` - Adds the specified domain to your subscription list to receive alerts.
 - `/unsubscribe <domain>` - Removes the specified domain from your subscription list.
 - `/list` - Shows all domains you are currently subscribed to.
 - `/status` - Provides the bot's health status, including RPC chain ID and number of active subscriptions.
+- `/simulate [domain]` - Simulates fake domain events for testing (default: test.dom).
 
 ## Environment Variables
 
@@ -90,7 +109,12 @@ The bot listens to on-chain events from the Doma Protocol smart contracts, speci
 - `DomainExpired`
 - `DomainTransferred`
 
-When one of these events occurs, the bot sends a Telegram alert message to all users subscribed to the affected domain.
+When one of these events occurs, the bot sends a Telegram alert message to all users subscribed to the affected domain. Each alert includes:
+- Event details (domain, owner, transaction hash, etc.)
+- A clickable link to view the transaction on the Doma Explorer
+- Clickable links to view the domain on the Doma Marketplace (both full URL and shortened domain)
+
+The `/simulate` command can be used to test the alert format with fake events.
 
 ## Development and Contribution
 
