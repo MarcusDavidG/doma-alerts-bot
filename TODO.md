@@ -8,3 +8,7 @@
 - [x] Verify bot starts cleanly and only notifies subscribed users
 - [x] Add /simulate command to generate fake events for a domain (with 4-second delays between messages)
 - [x] Update /help to include /simulate
+- [x] Remove TEST_CHAT_ID logic completely
+- [x] Update /start to store chat.id in subscriptions.json if not present
+- [x] Ensure event listeners check all chatId entries and send alerts only to subscribed users
+- [x] Allow multiple users to subscribe independently
