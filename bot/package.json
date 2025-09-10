@@ -4,7 +4,7 @@
   "description": "Telegram bot for Doma alerts",
   "main": "index.js",
   "scripts": {
-    "start": "node bot/index.js"
+    "start": "node index.js"
   },
   "dependencies": {
     "telegraf": "^4.12.2",
