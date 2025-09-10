@@ -51,6 +51,22 @@ This project belongs to the **Web3 / Blockchain** category, specifically focusin
    npm start
    ```
 
+## Deployment
+
+This bot can be deployed to Railway for 24/7 operation.
+
+### Railway Deployment
+
+1. Go to [Railway.app](https://railway.app) and create a new project.
+2. Link your GitHub repository containing this project.
+3. Railway will automatically detect the `railway.json` config and deploy the bot.
+4. In the Railway dashboard, add the following environment variables:
+   - `TELEGRAM_BOT_TOKEN`: Your Telegram bot token from BotFather.
+   - `DOMA_RPC_URL`: The RPC URL for the Doma Protocol blockchain.
+5. Railway will run `npm install` and then `npm start` to keep the bot running continuously.
+
+The bot will be accessible 24/7 without manual intervention.
+
 ## Usage
 
 1. Start a chat with your bot on Telegram by searching for your bot's username.
